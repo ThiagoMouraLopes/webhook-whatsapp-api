@@ -9,6 +9,15 @@ app.use(bodyParser.json());
 
 app.post("/whatsapp-webhook", async (req, res) => {
   try {
+    if (
+      req.query["hub.mode"] == "subscribe" &&
+      req.query["hub.verify_token"] == "123"
+    ) {
+      res.send(req.query["hub.challenge"]);
+    } else {
+      res.sendStatus(400);
+    }
+
     // Verifica se a chave de integração está presente no cabeçalho
     const integrationKey = req.headers["integrationkey"];
 
