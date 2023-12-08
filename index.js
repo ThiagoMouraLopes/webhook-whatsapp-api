@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/whatsapp-webhook", async (req, res) => {
+app.get("/webhooks", async (req, res) => {
   console.log("receive webhook");
   console.log({ queries: req.query });
   if (
@@ -24,7 +24,7 @@ app.get("/whatsapp-webhook", async (req, res) => {
   }
 });
 
-app.post("/whatsapp-webhook", async (req, res) => {
+app.post("/webhooks", async (req, res) => {
   try {
     // Verifica se a chave de integração está presente no cabeçalho
     const integrationKey = req.headers["integrationkey"];
