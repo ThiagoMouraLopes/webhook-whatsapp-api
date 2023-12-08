@@ -11,9 +11,6 @@ app.post("/whatsapp-webhook", async (req, res) => {
   try {
     // Verifica se a chave de integração está presente no cabeçalho
     const integrationKey = req.headers["integrationkey"];
-    if (integrationKey !== "ebe1fc26-45ce-49e9-9282-97769f655353") {
-      return res.status(401).json({ error: "Chave de integração inválida." });
-    }
 
     // Processa a mensagem do WhatsAppps
     const whatsappMessage = req.body.message; // Adapte conforme a estrutura real da mensagem
