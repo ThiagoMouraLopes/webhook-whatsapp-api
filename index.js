@@ -8,6 +8,8 @@ const port = 3000;
 app.use(bodyParser.json());
 
 app.post("/whatsapp-webhook", async (req, res) => {
+  console.log("receive webhook");
+  console.log({ queries: req.query });
   if (
     req.query["hub.mode"] == "subscribe" &&
     req.query["hub.verify_token"] == "123"
