@@ -52,10 +52,7 @@ app.post("/whatsapp-webhook", async (req, res) => {
       console.log("deu erro!");
     }
 
-    res.json({
-      success: true,
-      message: "Oportunidade criada com sucesso no CRM.",
-    });
+    res.send(req.query["hub.challenge"]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro interno do servidor." });
