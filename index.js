@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post("/whatsapp-webhook", async (req, res) => {
+app.get("/whatsapp-webhook", async (req, res) => {
   console.log("receive webhook");
   console.log({ queries: req.query });
   if (
@@ -22,8 +22,9 @@ app.post("/whatsapp-webhook", async (req, res) => {
   } else {
     res.sendStatus(400);
   }
+});
 
-  /*
+app.post("/whatsapp-webhook", async (req, res) => {
   try {
     // Verifica se a chave de integração está presente no cabeçalho
     const integrationKey = req.headers["integrationkey"];
@@ -68,12 +69,11 @@ app.post("/whatsapp-webhook", async (req, res) => {
       console.log("deu erro!");
     }
 
-    res.send(req.query["hub.challenge"]);
+    res.json({ Sucess: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro interno do servidor." });
   }
-*/
 });
 
 app.listen(port, () => {
