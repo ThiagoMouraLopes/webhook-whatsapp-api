@@ -17,8 +17,8 @@ app.post("/whatsapp-webhook", async (req, res) => {
     const data = {};
 
     const phoneNumber =
-      req.body.entry[0].changes[0].metadata.display_phone_number;
-    const name = req.body.entry[0].changes[0].contacts[0].profile.name;
+      req.body.entry[0].changes[0].value.metadata.display_phone_number;
+    const name = req.body.entry[0].changes[0].value.contacts[0].profile.name;
 
     // Crie a oportunidade no CRM com base nas informações da mensagem
     const oportunidade = {
