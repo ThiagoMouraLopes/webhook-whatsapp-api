@@ -15,37 +15,45 @@ app.post("/whatsapp-webhook", async (req, res) => {
       return res.status(401).json({ error: "Chave de integração inválida." });
     }
 
-    // Processa a mensagem do WhatsApp
+    // Processa a mensagem do WhatsAppps
     const whatsappMessage = req.body.message; // Adapte conforme a estrutura real da mensagem
+    const data = {};
+
+    const phoneNumber =
+      req.body.entry[0].changes[0].metadata.display_phone_number;
+    const name = req.body.entry[0].changes[0].contacts[0].profile.name;
 
     // Crie a oportunidade no CRM com base nas informações da mensagem
     const oportunidade = {
       // Adaptar com as informações da mensagem do WhatsApp
-      titulo: "Título da Oportunidade",
+      titulo: `${name} - Título da Oportunidade`,
       valor: 1000,
       codigo_vendedor: 60206,
       codigo_metodologia: 456,
       codigo_etapa: 789,
       codigo_canal_venda: 20897,
       empresa: {
-        nome: "Nome da Empresa",
-        cnpj: "12345678901234",
-        segmento: "Segmento da Empresa",
-        // Adicionar outros campos conforme necessário
+        nome: name,
+        cnpj: "",
+        segmento: "",
       },
       contato: {
-        nome: "Nome do Contato",
-        email: "contato@email.com",
-        telefone1: "123456789",
+        nome: name,
+        email: "",
+        telefone1: phoneNumber,
         // Adicionar outros campos conforme necessário
       },
     };
 
     // Faça uma requisição para a API do CRM para criar a oportunidade
-    const response = await axios.post(
-      "https://app.funildevendas.com.br/api/Opportunity?IntegrationKey=",
-      { oportunidades: [oportunidade] }
-    );
+    try {
+      await axios.post(
+        "https://app.funildevendas.com.br/api/Opportunity?IntegrationKey=",
+        { oportunidades: [oportunidade] }
+      );
+    } catch {
+      console.log("deu erro!");
+    }
 
     res.json({
       success: true,
