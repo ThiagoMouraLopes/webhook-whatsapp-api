@@ -33,28 +33,59 @@ app.post("/webhooks", async (req, res) => {
     const whatsappMessage = req.body.message; // Adapte conforme a estrutura real da mensagem
     const data = {};
 
-    const phoneNumber =
+    const receiverPhoneNumber =
       req.body.entry[0].changes[0].value.metadata.display_phone_number;
-    const name = req.body.entry[0].changes[0].value.contacts[0].profile.name;
+    const contactName =
+      req.body.entry[0].changes[0].value.contacts[0].profile.name;
+    const contactWhatsappId =
+      req.body.entry[0].changes[0].value.contacts[0].wa_id;
 
-    // Crie a oportunidade no CRM com base nas informações da mensagem
+    console.log("contactWhatsappId", contactWhatsappId);
+
+    const facebookAccessToken =
+      "EAAMa1MvEg6wBO15SEjjDMegWRQAhZAbAnoYZADBsqscZC4gy7jJFc1gXsx3tQssn4MyUJOt6cdyZCbc0cduCS8t4UQU4JTM1C7twgZAuvRYRkeuUzhhO13QOTzTf3sS3I1870kZATHahpEYuIpbVxSw6yxAhYmjQUPVvy6B5SpR4ZB61cQ6V6NQkiwkhRGAaeMZAj9eALhihT5an";
+
+    const findContact = await axios
+      .get(
+        `https://graph.facebook.com/v18.0/${contactWhatsappId}?fields=id,name,phone_numbers`,
+        {
+          headers: {
+            Authorization: `Bearer ${facebookAccessToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log("contact", JSON.stringify(res.data));
+        return res.data;
+      })
+      .catch((err) => {
+        console.log("contact not fonud", err.response.data);
+        throw err;
+      });
+    const contactPhoneNumber = findContact.display_phone_number.replace(
+      /\D/g,
+      ""
+    );
+
+    const sellerId = receiverPhoneNumber ? 60206 : 60206;
+
     const oportunidade = {
       // Adaptar com as informações da mensagem do WhatsApp
       titulo: "Oportunidades",
       valor: 100,
-      codigo_vendedor: 60206,
+      codigo_vendedor: sellerId,
       codigo_metodologia: 20897,
       codigo_etapa: 93269,
       codigo_canal_venda: 104961,
       empresa: {
-        nome: name,
+        nome: contactName,
         cnpj: "",
         segmento: "",
       },
       contato: {
-        nome: name,
+        nome: contactName,
         email: "",
-        telefone1: phoneNumber,
+        telefone1: contactPhoneNumber,
         // Adicionar outros campos conforme necessário
       },
     };
@@ -68,13 +99,14 @@ app.post("/webhooks", async (req, res) => {
         { oportunidades: [oportunidade] }
       );
       console.log("sucess", response.data);
-    } catch {
+    } catch (error) {
       console.log("deu erro!");
+      throw error;
     }
 
     res.json({ Sucess: true });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     res.status(500).json({ error: "Erro interno do servidor." });
   }
 });
