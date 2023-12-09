@@ -26,53 +26,46 @@ app.get("/webhooks", async (req, res) => {
 
 app.post("/webhooks", async (req, res) => {
   try {
-    // Verifica se a chave de integração está presente no cabeçalho
-    const integrationKey = "ebe1fc26-45ce-49e9-9282-97769f655353";
-
-    // Processa a mensagem do WhatsAppps
-    const whatsappMessage = req.body.message; // Adapte conforme a estrutura real da mensagem
-    const data = {};
+    const funilDeVendasIntegrationKey = "ebe1fc26-45ce-49e9-9282-97769f655353";
 
     const receiverPhoneNumber =
       req.body.entry[0].changes[0].value.metadata.display_phone_number;
     const contactName =
       req.body.entry[0].changes[0].value.contacts[0].profile.name;
-    const contactWhatsappId =
-      req.body.entry[0].changes[0].value.contacts[0].wa_id;
-
-    console.log("contactWhatsappId", contactWhatsappId);
-
-    const facebookAccessToken =
-      "EAAMa1MvEg6wBO15SEjjDMegWRQAhZAbAnoYZADBsqscZC4gy7jJFc1gXsx3tQssn4MyUJOt6cdyZCbc0cduCS8t4UQU4JTM1C7twgZAuvRYRkeuUzhhO13QOTzTf3sS3I1870kZATHahpEYuIpbVxSw6yxAhYmjQUPVvy6B5SpR4ZB61cQ6V6NQkiwkhRGAaeMZAj9eALhihT5an";
-
-    const findContact = await axios
-      .get(
-        `https://graph.facebook.com/v18.0/${contactWhatsappId}?fields=id,name,phone_numbers`,
-        {
-          headers: {
-            Authorization: `Bearer ${facebookAccessToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log("contact", JSON.stringify(res.data));
-        return res.data;
-      })
-      .catch((err) => {
-        console.log("contact not fonud", err.response.data);
-        throw err;
-      });
-    const contactPhoneNumber = findContact.display_phone_number.replace(
-      /\D/g,
-      ""
+    const contactPhoneNumber = String(
+      req.body.entry[0].changes[0].value.contacts[0].wa_id
     );
+
+    // const facebookAccessToken =
+    //   "EAAMa1MvEg6wBO15SEjjDMegWRQAhZAbAnoYZADBsqscZC4gy7jJFc1gXsx3tQssn4MyUJOt6cdyZCbc0cduCS8t4UQU4JTM1C7twgZAuvRYRkeuUzhhO13QOTzTf3sS3I1870kZATHahpEYuIpbVxSw6yxAhYmjQUPVvy6B5SpR4ZB61cQ6V6NQkiwkhRGAaeMZAj9eALhihT5an";
+
+    // const findContact = await axios
+    //   .get(
+    //     `https://graph.facebook.com/v18.0/${contactWhatsappId}?fields=id,name,phone_numbers`,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${facebookAccessToken}`,
+    //       },
+    //     }
+    //   )
+    //   .then((res) => {
+    //     console.log("contact", JSON.stringify(res.data));
+    //     return res.data;
+    //   })
+    //   .catch((err) => {
+    //     console.log("contact not fonud", err.response.data);
+    //     throw err;
+    //   });
+    // const contactPhoneNumber = findContact.display_phone_number.replace(
+    //   /\D/g,
+    //   ""
+    // );
 
     const sellerId = receiverPhoneNumber ? 60206 : 60206;
 
     const oportunidade = {
-      // Adaptar com as informações da mensagem do WhatsApp
-      titulo: "Oportunidades",
-      valor: 100,
+      titulo: "Lead",
+      valor: 0,
       codigo_vendedor: sellerId,
       codigo_metodologia: 20897,
       codigo_etapa: 93269,
@@ -86,16 +79,13 @@ app.post("/webhooks", async (req, res) => {
         nome: contactName,
         email: "",
         telefone1: contactPhoneNumber,
-        // Adicionar outros campos conforme necessário
       },
     };
-
-    console.log("oportunidade", oportunidade);
 
     // Faça uma requisição para a API do CRM para criar a oportunidade
     try {
       const response = await axios.post(
-        `https://app.funildevendas.com.br/api/Opportunity?IntegrationKey=ebe1fc26-45ce-49e9-9282-97769f655353`,
+        `https://app.funildevendas.com.br/api/Opportunity?IntegrationKey=${funilDeVendasIntegrationKey}`,
         { oportunidades: [oportunidade] }
       );
       console.log("sucess", response.data);
@@ -106,7 +96,7 @@ app.post("/webhooks", async (req, res) => {
 
     res.json({ Sucess: true });
   } catch (error) {
-    // console.error(error);
+    console.error(error?.response?.data || error?.response || error);
     res.status(500).json({ error: "Erro interno do servidor." });
   }
 });
