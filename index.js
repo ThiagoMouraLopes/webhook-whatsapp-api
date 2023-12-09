@@ -71,7 +71,7 @@ app.post("/webhooks", async (req, res) => {
       codigo_etapa: 93269,
       codigo_canal_venda: 104961,
       empresa: {
-        nome: contactName,
+        nome: "",
         cnpj: "",
         segmento: "",
       },
